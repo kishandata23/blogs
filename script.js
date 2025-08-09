@@ -158,10 +158,9 @@ document.addEventListener('DOMContentLoaded', () => {
             blogDetailSection.classList.remove('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
 
-            // Update URL with blog filename (without reload)
-            const url = new URL(window.location);
-            url.searchParams.set('blog', blog.contentFile);
-            history.pushState({ blogId: blogId }, '', url);
+            const blogSlug = blog.contentFile.replace('.html', '');
+            const newPath = window.location.pathname.replace(/\/[^\/]*$/, '/') + blogSlug;
+            history.pushState({ blogId: blogId }, '', newPath);
         } catch (error) {
             blogDetailContentDiv.innerHTML = `<p>Error loading blog content.</p>`;
             console.error(error);
@@ -229,8 +228,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Initial load: check URL for blog param
-    const urlParams = new URLSearchParams(window.location.search);
-    const blogFileFromUrl = urlParams.get('blog');
+    const pathSegments = window.location.pathname.split('/');
+    const blogSlug = pathSegments[pathSegments.length - 1]; // e.g. "blog-2"
+
+    let blogFileFromUrl = null;
+    if (blogSlug && blogSlug.startsWith('blog-')) {
+        blogFileFromUrl = `${blogSlug}.html`;
+    }
 
     populateTagFilter();
 
