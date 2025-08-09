@@ -159,8 +159,9 @@ document.addEventListener('DOMContentLoaded', () => {
             window.scrollTo({ top: 0, behavior: 'smooth' });
 
             const blogSlug = blog.contentFile.replace('.html', '');
-            const newPath = window.location.pathname.replace(/\/[^\/]*$/, '/') + blogSlug;
-            history.pushState({ blogId: blogId }, '', newPath);
+            const newUrl = window.location.pathname + '#/' + blogSlug;
+            history.pushState({ blogId: blogId }, '', newUrl);
+
         } catch (error) {
             blogDetailContentDiv.innerHTML = `<p>Error loading blog content.</p>`;
             console.error(error);
@@ -227,9 +228,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Initial load: check URL for blog param
-    const pathSegments = window.location.pathname.split('/');
-    const blogSlug = pathSegments[pathSegments.length - 1]; // e.g. "blog-2"
+    // Initial load: check hash URL for blog slug
+    const hash = window.location.hash; // e.g. "#/blog-1"
+    let blogSlug = hash.startsWith('#/') ? hash.slice(2) : null;
 
     let blogFileFromUrl = null;
     if (blogSlug && blogSlug.startsWith('blog-')) {
@@ -250,5 +251,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     } else {
         displayBlogList('all', 1);
+    }
+});
+
+window.addEventListener('popstate', (event) => {
+    const hash = window.location.hash;
+    const blogSlug = hash.startsWith('#/') ? hash.slice(2) : null;
+    const blogFromUrl = blogSlug ? blogs.find(b => b.contentFile === `${blogSlug}.html`) : null;
+
+    if (blogFromUrl) {
+        filteredBlogs = blogs.slice().sort((a, b) => b.id - a.id);
+        showBlogDetail(blogFromUrl.id);
+    } else {
+        displayBlogList(tagFilterSelect.value, currentPage);
     }
 });
