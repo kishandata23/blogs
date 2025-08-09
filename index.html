@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Blog</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        footer {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  padding: 10px;
+  background-color: rgb(9, 7, 7);
+  color: white;
+  text-align: center;
+}
+    </style>
+</head>
+<body>
+    <header>
+        <h1>My Awesome Blog</h1>
+    </header>
+
+    <main>
+        <section id="blog-list-section" class="active">
+            <div class="section-header">
+                <h2>Latest Posts</h2>
+                <div class="filter-container">
+                    <label for="tag-filter">Filter by Tag:</label>
+                    <select id="tag-filter">
+                        <option value="all">All</option>
+                        <!-- Options will be populated by JavaScript -->
+                    </select>
+                </div>
+            </div>
+            <div id="blog-list">
+                <!-- Blog items will be loaded here by JavaScript -->
+            </div>
+            <div class="pagination-controls">
+                <button id="prev-page-btn">← Previous Page</button>
+                <span id="page-info"></span>
+                <button id="next-page-btn">Next Page →</button>
+            </div>
+        </section>
+
+        <section id="blog-detail-section" class="hidden">
+            <button id="back-to-list">← Back to Blog List</button>
+            <div id="blog-detail-content">
+                <!-- Single blog post content will be loaded here by JavaScript -->
+            </div>
+            <div class="blog-navigation">
+                <button id="prev-blog">← Previous Article</button>
+                <button id="next-blog">Next Article →</button>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+    &copy; 2025 All rights reserved.
+  </footer>
+    <script src="script.js"></script>
+</body>
+</html>
