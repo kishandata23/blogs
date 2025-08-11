@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
             readTime: "7 min read",
             imageUrl: "https://via.placeholder.com/640x360/555555/EEEEEE?text=Responsive+Design",
             contentFile: "blog-2.html",
-            tags: ['CSS', 'Frontend', 'Design']
+            tags: [ 'Python', 'AI']
         },
         {
             id: 3,
@@ -25,12 +25,11 @@ document.addEventListener('DOMContentLoaded', () => {
             readTime: "6 min read",
             imageUrl: "https://via.placeholder.com/640x360/666666/EEEEEE?text=Async+JS",
             contentFile: "blog-3.html",
-            tags: ['JavaScript', 'Backend', 'Concepts']
-        },
-        // Additional blogs commented out in your original code can be added here
+            tags: ['JavaScript', 'Backend']
+        }
     ];
 
-    const blogsPerPage = 12; // Number of blogs to show per page
+    const blogsPerPage = 12;
     let currentPage = 1;
     let filteredBlogs = [];
     let currentBlogIndex = 0;
@@ -70,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
         filteredBlogs = blogs.filter(blog => {
             if (filterTag === 'all') return true;
             return blog.tags.some(tag => tag.toLowerCase() === filterTag);
-        }).sort((a, b) => b.id - a.id); // Sort by id descending
+        }).sort((a, b) => b.id - a.id);
 
         currentPage = page;
 
@@ -123,12 +122,10 @@ document.addEventListener('DOMContentLoaded', () => {
         blogDetailSection.classList.remove('active');
         window.scrollTo({ top: 0, behavior: 'smooth' });
 
-        // Remove blog query param from URL when back to list
+        // Clear blog slug from URL when returning to list
         const url = new URL(window.location);
-        if (url.searchParams.has('blog')) {
-            url.searchParams.delete('blog');
-            history.pushState({}, '', url);
-        }
+        url.hash = '';
+        history.pushState({}, '', url);
     }
 
     async function showBlogDetail(blogId) {
@@ -179,15 +176,15 @@ document.addEventListener('DOMContentLoaded', () => {
         prevPageBtn.disabled = currentPage <= 1;
         nextPageBtn.disabled = currentPage >= totalPages;
 
-        if (totalPages > 0) {
-            pageInfoSpan.textContent = `Page ${currentPage} of ${totalPages}`;
-        } else {
-            pageInfoSpan.textContent = '';
-        }
+        pageInfoSpan.textContent = totalPages > 0 ? `Page ${currentPage} of ${totalPages}` : '';
     }
 
     backToListBtn.addEventListener('click', () => {
         displayBlogList(tagFilterSelect.value, currentPage);
+
+        const url = new URL(window.location);
+        url.hash = '';
+        history.pushState({}, '', url);
     });
 
     prevBlogBtn.addEventListener('click', () => {
@@ -221,15 +218,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Handle browser back/forward buttons
     window.addEventListener('popstate', (event) => {
-        if (event.state && event.state.blogId) {
-            showBlogDetail(event.state.blogId);
+        const hash = window.location.hash;
+        const blogSlug = hash.startsWith('#/') ? hash.slice(2) : null;
+        const blogFromUrl = blogSlug ? blogs.find(b => b.contentFile === `${blogSlug}.html`) : null;
+
+        if (blogFromUrl) {
+            filteredBlogs = blogs.slice().sort((a, b) => b.id - a.id);
+            showBlogDetail(blogFromUrl.id);
         } else {
             displayBlogList(tagFilterSelect.value, currentPage);
         }
     });
 
     // Initial load: check hash URL for blog slug
-    const hash = window.location.hash; // e.g. "#/blog-1"
+    const hash = window.location.hash;
     let blogSlug = hash.startsWith('#/') ? hash.slice(2) : null;
 
     let blogFileFromUrl = null;
@@ -238,31 +240,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     populateTagFilter();
+filteredBlogs = blogs.slice().sort((a, b) => b.id - a.id); // Ensure it's always sorted
 
-    if (blogFileFromUrl) {
-        // Find the blog by contentFile from URL
-        const blogFromUrl = blogs.find(b => b.contentFile === blogFileFromUrl);
-        if (blogFromUrl) {
-            // Set filteredBlogs to full blogs sorted descending
-            filteredBlogs = blogs.slice().sort((a, b) => b.id - a.id);
-            showBlogDetail(blogFromUrl.id);
-        } else {
-            displayBlogList('all', 1);
-        }
+if (blogFileFromUrl) {
+    const blogFromUrl = filteredBlogs.find(b => b.contentFile === blogFileFromUrl);
+    if (blogFromUrl) {
+        currentPage = 1;
+        showBlogDetail(blogFromUrl.id);
     } else {
         displayBlogList('all', 1);
     }
-});
+} else {
+    displayBlogList('all', 1);
+}
 
-window.addEventListener('popstate', (event) => {
-    const hash = window.location.hash;
-    const blogSlug = hash.startsWith('#/') ? hash.slice(2) : null;
-    const blogFromUrl = blogSlug ? blogs.find(b => b.contentFile === `${blogSlug}.html`) : null;
-
-    if (blogFromUrl) {
-        filteredBlogs = blogs.slice().sort((a, b) => b.id - a.id);
-        showBlogDetail(blogFromUrl.id);
-    } else {
-        displayBlogList(tagFilterSelect.value, currentPage);
-    }
 });
